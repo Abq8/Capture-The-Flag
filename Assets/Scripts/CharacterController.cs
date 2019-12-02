@@ -12,9 +12,8 @@ public class CharacterController : MonoBehaviour
     [Header("Soldier Movment")]
     [SerializeField] private float speed;
 
-
-    [Header("Walk Rotaion Speed")]
-    [SerializeField] private float rotationSpeed;
+    [Header("Main Camera")]
+    [SerializeField] private GameObject mainCamera;
 
     // Start is called before the first frame update
     void Start()
@@ -30,15 +29,21 @@ public class CharacterController : MonoBehaviour
     }
     void precessMovement()
     {
+        Vector3 fromCameraToMe = transform.position - mainCamera.transform.position;
+        fromCameraToMe.y = 0;
+        fromCameraToMe.Normalize();
+
+
         float horizontal = Input.GetAxis("Horizontal");
         float vertical = Input.GetAxis("Vertical");
-        Vector3 movement = new Vector3(horizontal, 0.0f, vertical);
+
+        Vector3 movement = (fromCameraToMe * vertical + mainCamera.transform.right * horizontal) * speed;
+
 
         if (movement != Vector3.zero)
-            transform.rotation = Quaternion.Slerp(transform.rotation,Quaternion.LookRotation(movement), rotationSpeed);
+            transform.rotation = Quaternion.Slerp(transform.rotation,Quaternion.LookRotation(movement), speed);
 
 
-        
         transform.Translate(movement * speed * Time.deltaTime, Space.World);
     }
 
@@ -53,7 +58,7 @@ public class CharacterController : MonoBehaviour
         if (Input.GetKey(KeyCode.RightShift)) 
         { 
             soldierAnimator.SetBool("isRunning", true);
-            speed = 5;
+            speed = 3;
         }
         else      
         {

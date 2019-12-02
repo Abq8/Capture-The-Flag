@@ -4,38 +4,37 @@ using UnityEngine;
 
 public class CameraRotater : MonoBehaviour
 {
-    public Transform target;
-    public Vector3 offset;
-    public bool useOffsetValues;
-    public float rotateSpeed;
-    public Transform pivot;
-    // Start is called before the first frame update
-    void Start()
+    // SerializeFields
+
+    [Header("Rotaion Speed")]
+    [SerializeField] private int speedRotation;
+
+    [Header("Camera Pivot Transform")]
+    [SerializeField] private Transform camPivot;
+
+    [Header("Camera Hight")]
+    [SerializeField] private float height = 1f;
+
+    [Header("Camera Destance")]
+    [SerializeField] private float distance = 2f;
+
+    // Components
+
+    private Vector3 offsetX;
+
+     void Start()
     {
-        if (!useOffsetValues)
-        offset = target.position - transform.position;
-        pivot.transform.position = target.transform.position;
-        //pivot.transform.parent = target.transform;
+        offsetX = new Vector3(0,height,distance);
         Cursor.lockState = CursorLockMode.Locked;
     }
-    // Update is called once per frame
-    void LateUpdate()
+
+     void LateUpdate()
     {
-        float horizontal = Input.GetAxis("Fire2") * rotateSpeed;
-        target.Rotate(0, horizontal, 0);
+        offsetX = Quaternion.AngleAxis(Input.GetAxis("Mouse X") * speedRotation, Vector3.up)* offsetX;
 
-        //float vertical = Input.GetAxis("Fire2") * rotateSpeed;
-       // pivot.Rotate(-vertical, 0, 0);
-
-        //float desiredYangle = target.eulerAngles.y;
-        float desiredXangle = pivot.eulerAngles.x;
-
-        Quaternion rotation = Quaternion.Euler(desiredXangle, pivot.rotation.y, 0);
-        transform.position = target.position - (rotation * offset);
-
-        if (transform.position.y < target.position.y)
-            transform.position = new Vector3(transform.position.x, target.position.y, transform.position.z);
-            transform.LookAt(target);
-
+        transform.position = camPivot.position + offsetX;
+        transform.LookAt(camPivot.position);
     }
 }
+
+
